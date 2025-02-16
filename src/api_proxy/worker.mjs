@@ -76,6 +76,7 @@ const API_CLIENT = "genai-js/0.21.0"; // npm view @google/generative-ai version
 const makeHeaders = (apiKey, more) => ({
   "x-goog-api-client": API_CLIENT,
   ...(apiKey && { "x-goog-api-key": apiKey }),
+  "api-version": API_VERSION,
   ...more
 });
 
@@ -142,9 +143,10 @@ async function handleEmbeddings (req, apiKey) {
 }
 
 const DEFAULT_MODEL = "gemini-1.5-pro-latest";
-async function handleCompletions (req, apiKey) {
+
+async function handleCompletions(req, apiKey) {
   let model = DEFAULT_MODEL;
-  switch(true) {
+  switch (true) {
     case typeof req.model !== "string":
       break;
     case req.model.startsWith("models/"):
@@ -160,12 +162,12 @@ async function handleCompletions (req, apiKey) {
   const response = await fetch(url, {
     method: "POST",
     headers: makeHeaders(apiKey, { "Content-Type": "application/json" }),
-    body: JSON.stringify(await transformRequest(req)), // try
+    body: JSON.stringify(await transformRequest(req)),
   });
 
   let body = response.body;
   if (response.ok) {
-    let id = generateChatcmplId(); //"chatcmpl-8pMMaqXMK68B3nyDBrapTDrhkHBQK";
+    let id = generateChatcmplId();
     if (req.stream) {
       body = response.body
         .pipeThrough(new TextDecoderStream())
